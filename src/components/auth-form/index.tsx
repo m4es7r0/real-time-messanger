@@ -54,9 +54,10 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
         .then((res) => {
           if (res.status === 200) {
             reset();
+            toast.success("Account created");
           }
         })
-        .catch(() => toast.error("Something went wrong!"))
+        .catch((e) => toast.error(e.response.data || "Something went wrong!"))
         .finally(() => setIsLoading(false));
     }
 
