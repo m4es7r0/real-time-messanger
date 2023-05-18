@@ -2,9 +2,10 @@
 import { FC, useCallback, useState } from "react";
 
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 import { BsGithub, BsGoogle } from "react-icons/bs";
 
@@ -62,14 +63,39 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
     }
 
     if (variant === "LOGIN") {
-      // nextAuth sign in
+      signIn("credentials", {
+        ...data,
+        redirect: false,
+      })
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error("Invalid credentials");
+          }
+          if (callback?.ok && !callback?.error) {
+            reset();
+            toast.success("Logged in!");
+          }
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 
   const socialAction = (action: string) => {
     setIsLoading(true);
 
-    // nextAuth sotial sign in
+    signIn(action, {
+      redirect: false,
+    })
+      .then((callback) => {
+        if (callback?.error) {
+          toast.error("Invalid credentials");
+        }
+        if (callback?.ok && !callback?.error) {
+          reset();
+          toast.success("Logged in!");
+        }
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
