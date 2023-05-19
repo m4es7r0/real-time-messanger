@@ -171,9 +171,13 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
           {variant === "LOGIN"
             ? "New to Real-Time Messenger?"
             : "Already have an account?"}
-          <div onClick={toggleVariant} className="underline cursor-pointer">
+          <button
+            onClick={toggleVariant}
+            className="underline cursor-pointer"
+            tabIndex={0}
+          >
             {variant === "LOGIN" ? "Create an account" : "Sign in"}
-          </div>
+          </button>
         </div>
       </div>
     </div>
