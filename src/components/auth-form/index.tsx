@@ -1,8 +1,9 @@
 "use client";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 
 import axios from "axios";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -13,15 +14,22 @@ import AuthSocialButton from "../auth-social-button";
 import Button from "../button";
 import Input from "../input";
 
-import styles from "./AuthForm.module.scss";
-
 interface AuthFormProps {}
 
 type Variant = "LOGIN" | "REGISTER";
 
 const AuthForm: FC<AuthFormProps> = ({}) => {
+  const router = useRouter();
+  const session = useSession();
   const [variant, setVariant] = useState<Variant>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      console.log("authenticated");
+      router.push("/users");
+    }
+  }, [session?.status, router]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -49,7 +57,6 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
     setIsLoading(true);
 
     if (variant === "REGISTER") {
-      // axios register
       axios
         .post("/api/signup", data)
         .then((res) => {
@@ -58,6 +65,7 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
             toast.success("Account created");
           }
         })
+        .then(() => signIn("credentials", { ...data, redirect: false }))
         .catch((e) => toast.error(e.response.data || "Something went wrong!"))
         .finally(() => setIsLoading(false));
     }
@@ -74,6 +82,7 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
           if (callback?.ok && !callback?.error) {
             reset();
             toast.success("Logged in!");
+            router.push("/users");
           }
         })
         .finally(() => setIsLoading(false));
@@ -100,7 +109,7 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
 
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div className="bg-zinc-50 dark:bg-slate-700 px-4 py-8 shadow rounded-lg sm:px-10">
+      <div className="bg-zinc-50 dark:bg-black-semi px-4 py-8 shadow rounded-lg sm:px-10">
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {variant === "REGISTER" && (
             <Input
@@ -141,7 +150,7 @@ const AuthForm: FC<AuthFormProps> = ({}) => {
           </div>
 
           <div className="relative flex justify-center text-sm">
-            <span className="bg-zinc-50 dark:bg-slate-700 px-2 text-gray-500 dark:text-gray-300">
+            <span className="bg-zinc-50 dark:bg-black-semi px-2 text-gray-500 dark:text-gray-300">
               Or continue with
             </span>
           </div>
