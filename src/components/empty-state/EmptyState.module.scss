@@ -1,0 +1,20 @@
+.empty-state {
+  @apply px-4 pt-10
+  sm:px-6
+  lg:px-8
+  h-full
+  flex justify-center items-center
+  dark:bg-black-semi
+  bg-gray-100;
+
+  & > div {
+    @apply flex flex-col items-center
+    text-center;
+
+    & > h3 {
+      @apply mt-2
+      text-2xl
+      font-semibold;
+    }
+  }
+}
